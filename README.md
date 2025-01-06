@@ -7,9 +7,19 @@
 1. [Description](#description)
 2. [Ecoflow API implemented so far](#ecoflow-api-implemented-so-far)
 3. [Deployment](#deployment)
+    - [Get docker container from registry](#get-docker-container-from-registry)
+    - [Build the Server from source](#build-the-server-from-source)
+    - [Build a Docker Image from source](#build-a-docker-image-from-source)
 4. [Requests / Responses](#requests--responses)
     - [Get all linked devices](#get-all-linked-devices)
     - [Get all parameters for given device](#get-all-parameters-for-given-device)
+    - [Get specified parameters for specified device](#get-specified-parameters-for-specified-device)
+    - [Enable/Disable AC/X-Boost](#enabledisable-acx-boost)
+    - [Enable/Disable DC](#enabledisable-dc)
+    - [Enable/Disable Car Output](#enabledisable-car-output)
+    - [Change charging speed](#change-charging-speed)
+    - [Change car input](#change-car-input)
+    - [Change StandBy parameters](#change-standby-parameters)
 
 ## Description
 
@@ -36,13 +46,55 @@ The access token is sent in `Authorization: Bearer XXX` header, the secret token
 
 ## Deployment
 
-TODO
+### Get docker container from registry
+
+Todo...
+
+### Build the Server from source
+
+1. Make sure you have Go installed (version 1.23 or later).
+2. Clone the repository:
+
+   ```shell
+   git clone https://github.com/tess1o/go-ecoflow-rest-api
+   cd go-ecoflow-rest-api
+   ```
+
+3. Build the project:
+
+   ```shell
+   go build -o go-ecoflow-rest-api .
+   ```
+
+4. Run the server locally:
+
+   ```shell
+   ./go-ecoflow-rest-api
+   ```
+
+Now the server should be accessible on `http://localhost:8080`.
+
+### Build a Docker Image from source
+
+1. Build the Docker image:
+
+   ```shell
+   docker build -t go-ecoflow-rest-api:latest .
+   ```
+
+2. Run the Docker container:
+
+   ```shell
+   docker run -p 8080:8080 go-ecoflow-rest-api:latest
+   ```
+
+Now the server should be accessible on `http://localhost:8080`.
 
 ## Requests / Responses
 
-- **Get all linked devices**
+- ### Get all linked devices
 
-Request
+**Request**
 
 ```shell
 curl -XGET http://localhost:8080/api/devices \
@@ -50,7 +102,7 @@ curl -XGET http://localhost:8080/api/devices \
 -H "X-Secret-Token: YOUR_SECRET_TOKEN"
 ```
 
-Response:
+**Response**:
 
 ```json
 {
@@ -78,8 +130,9 @@ Response:
 }
 ```
 
-- **Get all parameters for given device**:
-  Request:
+- ### Get all parameters for given device
+
+**Request**
 
 ```shell
 curl -XGET http://localhost:8080/api/devices/R351ZCB5HG8XXXXXX/parameters \
@@ -409,7 +462,7 @@ curl -XGET http://localhost:8080/api/devices/R351ZCB5HG8XXXXXX/parameters \
 
 </details>
 
-- **Get specified parameters for specified device**
+- ### Get specified parameters for specified device
 
 ```shell
 curl -XPOST http://localhost:8080/api/devices/R351ZCB5HGXXXXXX/parameters/query \
@@ -422,7 +475,7 @@ curl -XPOST http://localhost:8080/api/devices/R351ZCB5HGXXXXXX/parameters/query 
 
 - **parameters** - list of Ecoflow parameters that should be returned by the API. Must not be empty.
 
-Response example:
+**Response**:
 
 ```json
 {
@@ -440,8 +493,9 @@ Response example:
 }
 ```
 
-- **Enable/Disable AC/X-Boost**
-  Request:
+- ### Enable/Disable AC/X-Boost
+
+**Request**:
 
 ```shell
 curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HXXXXX/out/ac -H "Authorization: Bearer YOUR_ACCESS_TOKEN" -H "X-Secret-Token: YOUR_SECRET_TOKEN" -d '{"ac_state": "on", "xboost_state": "on", "out_freq": 50, "out_voltage" : 220}'
@@ -461,7 +515,7 @@ curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HXXXXX/out/ac -H "Aut
 - **`out_voltage`**: An integer representing the output voltage in volts. For example, `220` volts is common in some
   regions, while others may use `110` volts.
 
-Response example:
+**Response**:
 
 ```json
 {
@@ -473,7 +527,7 @@ Response example:
 }
 ```
 
-- **Enable/Disable DC**
+- ### Enable/Disable DC
 
 **Request**:
 
@@ -500,7 +554,7 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/dc -H "Au
 }
 ```
 
-- **Enable/Disable Car Output**
+- ### Enable/Disable Car Output
 
 **Request**:
 
@@ -527,9 +581,10 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 }
 ```
 
-- **Change charging speed**
+- ### Change charging speed
 
 **Request**
+
 ```shell
  5280  curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/input/speed \
  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
@@ -539,9 +594,10 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 
 **Explanation of Parameters**
 
-- **`watts`**: This parameter specifies the charging speed in watts. 
+- **`watts`**: This parameter specifies the charging speed in watts.
 
 **Response**
+
 ```json
 {
   "success": true,
@@ -552,20 +608,24 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 }
 ```
 
-- **Change car input**
+- ### Change car input
 
 **Request**
+
 ```shell
  5280  curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/input/car \
  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
  -H "X-Secret-Token: YOUR_SECRET_TOKENS" \
  -d '{"amps":8}'
 ```
+
 **Explanation of Parameters**
 
-- **`amps`**: Set 12 V DC (car charger) charging current(Maximum DC charging current (mA)). From 4 to 10 amps (according to Ecoflow documents)
+- **`amps`**: Set 12 V DC (car charger) charging current(Maximum DC charging current (mA)). From 4 to 10 amps (according
+  to Ecoflow documents)
 
 **Response**
+
 ```json
 {
   "success": true,
@@ -576,8 +636,10 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 }
 ```
 
-- **Change stand by parameters**
-  **Request**
+- ### Change StandBy parameters
+
+**Request**
+
 ```shell
  5280  curl -XPOST http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/standby \
  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
@@ -596,9 +658,10 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 
 - **`stand_by`**: The standby duration to set.
     - For `lcd`, specify the value in **seconds**.
-    - For all other types (`device`, `ac`, `car`), specify the value in **minutes**.  
-  
+    - For all other types (`device`, `ac`, `car`), specify the value in **minutes**.
+
 **Response**
+
 ```json
 {
   "success": true,
