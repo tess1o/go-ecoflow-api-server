@@ -30,6 +30,10 @@ headers.These tokens are not logged and not recorded.
 
 The access token is sent in `Authorization: Bearer XXX` header, the secret token as `X-Secret-Token` header.
 
+## Caution!
+
+The API is not stable and can be changed in the future until v.1.0.0 is released.
+
 ## Ecoflow API implemented so far:
 
 1. Get all linked devices

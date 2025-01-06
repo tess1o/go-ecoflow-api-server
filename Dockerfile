@@ -3,14 +3,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -o app .
+RUN CGO_ENABLED=0 GOOS=linux go build -o go-ecoflow-rest-api .
 
-FROM alpine
-ENV PORT=8080
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
-
+FROM alpine:edge
 WORKDIR /app
-COPY --from=builder /app/app .
+COPY --from=builder /app/go-ecoflow-rest-api .
+RUN apk --no-cache add ca-certificates tzdata
 EXPOSE 8080
 
-CMD ["./app"]
+ENTRYPOINT ["/app/go-ecoflow-rest-api"]
