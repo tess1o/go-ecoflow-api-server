@@ -1,4 +1,4 @@
-module go-ecoflow-rest-api
+module go-ecoflow-api-server
 
 go 1.23
 

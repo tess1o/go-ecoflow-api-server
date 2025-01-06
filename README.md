@@ -50,7 +50,9 @@ The API is not stable and can be changed in the future until v.1.0.0 is released
 
 ### Get docker container from registry
 
-Todo...
+```shell
+docker run -p 8080:8080 tess1o/go-ecoflow-api-server:latest
+```
 
 ### Build the Server from source
 
@@ -58,20 +60,20 @@ Todo...
 2. Clone the repository:
 
    ```shell
-   git clone https://github.com/tess1o/go-ecoflow-rest-api
-   cd go-ecoflow-rest-api
+   git clone https://github.com/tess1o/go-ecoflow-api-server
+   cd ggo-ecoflow-api-server
    ```
 
 3. Build the project:
 
    ```shell
-   go build -o go-ecoflow-rest-api .
+   go build -o go-ecoflow-api-server .
    ```
 
 4. Run the server locally:
 
    ```shell
-   ./go-ecoflow-rest-api
+   ./go-ecoflow-api-server
    ```
 
 Now the server should be accessible on `http://localhost:8080`.
@@ -81,13 +83,13 @@ Now the server should be accessible on `http://localhost:8080`.
 1. Build the Docker image:
 
    ```shell
-   docker build -t go-ecoflow-rest-api:latest .
+   docker build -t o-ecoflow-api-server:latest .
    ```
 
 2. Run the Docker container:
 
    ```shell
-   docker run -p 8080:8080 go-ecoflow-rest-api:latest
+   docker run -p 8080:8080 o-ecoflow-api-server:latest
    ```
 
 Now the server should be accessible on `http://localhost:8080`.

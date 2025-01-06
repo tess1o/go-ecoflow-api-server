@@ -38,5 +38,5 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            tess1o/go-ecoflow-rest-api:latest
-            tess1o/go-ecoflow-rest-api:${{ env.GIT_TAG || github.sha }}
+            tess1o/go-ecoflow-api-server:latest
+            tess1o/go-ecoflow-api-server:${{ env.GIT_TAG || github.sha }}

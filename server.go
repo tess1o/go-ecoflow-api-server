@@ -23,7 +23,7 @@ func main() {
 	router.HandleFunc("PUT /api/power_station/{serial_number}/input/car", PowerStationSetCarInput())
 	router.HandleFunc("PUT /api/power_station/{serial_number}/standby", PowerStationSetStandBy())
 
-	log.Println("Listening on :8080...")
+	log.Println("Starting Ecoflow API Server on :8080...")
 	err := http.ListenAndServe(":8080", LoggingMiddleware(AuthCheckMiddleware(router)))
 	log.Fatal(err)
 }

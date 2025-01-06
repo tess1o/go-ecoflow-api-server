@@ -3,12 +3,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o go-ecoflow-rest-api .
+RUN CGO_ENABLED=0 GOOS=linux go build -o go-ecoflow-api-server .
 
 FROM alpine:edge
 WORKDIR /app
-COPY --from=builder /app/go-ecoflow-rest-api .
+COPY --from=builder /app/go-ecoflow-api-server .
 RUN apk --no-cache add ca-certificates tzdata
 EXPOSE 8080
 
-ENTRYPOINT ["/app/go-ecoflow-rest-api"]
+ENTRYPOINT ["/app/go-ecoflow-api-server"]
