@@ -2,8 +2,6 @@
 
 ## Table of Contents
 
-## Table of Contents
-
 1. [Description](#description)
 2. [Ecoflow API implemented so far](#ecoflow-api-implemented-so-far)
 3. [Deployment](#deployment)
