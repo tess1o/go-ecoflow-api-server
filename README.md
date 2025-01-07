@@ -26,7 +26,7 @@ The server provides endpoints to query and control Ecoflow-compatible hardware, 
 integration for monitoring and management purposes.
 
 The server does not store any customer data, to access your Ecoflow devices you need to send Access and Secret Tokens as
-headers.These tokens are not logged and not recorded.
+headers.These tokens are not logged and not recorded on the server.
 
 The access token is sent in `Authorization: Bearer XXX` header, the secret token as `X-Secret-Token` header.
 
@@ -502,7 +502,10 @@ curl -XPOST http://localhost:8080/api/devices/R351ZCB5HGXXXXXX/parameters/query 
 **Request**:
 
 ```shell
-curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HXXXXX/out/ac -H "Authorization: Bearer YOUR_ACCESS_TOKEN" -H "X-Secret-Token: YOUR_SECRET_TOKEN" -d '{"ac_state": "on", "xboost_state": "on", "out_freq": 50, "out_voltage" : 220}'
+curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HXXXXX/out/ac \ 
+-H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+-H "X-Secret-Token: YOUR_SECRET_TOKEN" \
+-d '{"ac_state": "on", "xboost_state": "on", "out_freq": 50, "out_voltage" : 220}'
 ```
 
 **Parameters Explanation:**
@@ -536,7 +539,10 @@ curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HXXXXX/out/ac -H "Aut
 **Request**:
 
 ```shell
-curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/dc -H "Authorization: Bearer YOUR_ACCESS_TOKEN" -H "X-Secret-Token: YOUR_SECRET_TOKEN" -d '{"state": "on"}'
+curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/dc \
+-H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+-H "X-Secret-Token: YOUR_SECRET_TOKEN" \
+-d '{"state": "on"}'
 ```
 
 **Explanation of Parameters**
@@ -563,7 +569,10 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/dc -H "Au
 **Request**:
 
 ```shell
-curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "Authorization: Bearer YOUR_ACCESS_TOKEN" -H "X-Secret-Token: YOUR_SECRET_TOKEN" -d '{"state": "on"}'
+curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car \
+-H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+-H "X-Secret-Token: YOUR_SECRET_TOKEN" \
+-d '{"state": "on"}'
 ```
 
 **Explanation of Parameters**
@@ -590,9 +599,9 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 **Request**
 
 ```shell
- 5280  curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/input/speed \
+curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/input/speed \
  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
- -H "X-Secret-Token: YOUR_SECRET_TOKENS" \
+ -H "X-Secret-Token: YOUR_SECRET_TOKEN" \
  -d '{"watts":150}'
 ```
 
@@ -617,9 +626,9 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 **Request**
 
 ```shell
- 5280  curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/input/car \
+curl -XPUT http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/input/car \
  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
- -H "X-Secret-Token: YOUR_SECRET_TOKENS" \
+ -H "X-Secret-Token: YOUR_SECRET_TOKEN" \
  -d '{"amps":8}'
 ```
 
@@ -645,9 +654,9 @@ curl -XPUT http://localhost:8080/api/power_station/R351ZCB5HGXXXXX/out/car -H "A
 **Request**
 
 ```shell
- 5280  curl -XPOST http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/standby \
+curl -XPOST http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/standby \
  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
- -H "X-Secret-Token: YOUR_SECRET_TOKENS" \
+ -H "X-Secret-Token: YOUR_SECRET_TOKEN" \
  -d '{"type":"lcd", "stand_by":60}'
 ```
 

@@ -1,14 +1,23 @@
-package main
+package handlers
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/tess1o/go-ecoflow"
+	"go-ecoflow-api-server/constants"
 	"net/http"
 )
 
-func PowerStationSetEnableCarCharging() func(http.ResponseWriter, *http.Request) {
+type PowerStationHandler struct {
+	*BaseHandler
+}
+
+func NewPowerStationHandler(baseHandler *BaseHandler) *PowerStationHandler {
+	return &PowerStationHandler{baseHandler}
+}
+
+func (h *PowerStationHandler) PowerStationSetEnableCarCharging() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
@@ -18,7 +27,7 @@ func PowerStationSetEnableCarCharging() func(http.ResponseWriter, *http.Request)
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
 				"serial_number": sn,
 				"error":         err.Error(),
 			})
@@ -26,14 +35,14 @@ func PowerStationSetEnableCarCharging() func(http.ResponseWriter, *http.Request)
 		}
 
 		if requestBody.State != "on" && requestBody.State != "off" {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. State must be 'on' or 'off'", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. State must be 'on' or 'off'", map[string]string{
 				"serial_number": sn,
 				"state":         requestBody.State,
 			})
 			return
 		}
 
-		client, ok := getEcoflowClientOrRespondWithError(r, w)
+		client, ok := h.GetEcoflowClientOrRespondWithError(r, w)
 		if !ok {
 			return
 		}
@@ -47,15 +56,15 @@ func PowerStationSetEnableCarCharging() func(http.ResponseWriter, *http.Request)
 
 		ecoflowResponse, err := client.GetPowerStation(sn).SetCarChargerSwitch(context.Background(), newState)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ErrEnableCarOut, err.Error(), map[string]string{
+			h.RespondWithError(w, http.StatusInternalServerError, constants.ErrEnableCarOut, err.Error(), map[string]string{
 				"serial_number": sn,
 			})
 		}
-		respondWithSuccess(w, ecoflowResponse)
+		h.RespondWithSuccess(w, ecoflowResponse)
 	}
 }
 
-func PowerStationEnableDc() func(http.ResponseWriter, *http.Request) {
+func (h *PowerStationHandler) PowerStationEnableDc() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
@@ -65,7 +74,7 @@ func PowerStationEnableDc() func(http.ResponseWriter, *http.Request) {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
 				"serial_number": sn,
 				"error":         err.Error(),
 			})
@@ -73,14 +82,14 @@ func PowerStationEnableDc() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.State != "on" && requestBody.State != "off" {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. State must be 'on' or 'off'", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. State must be 'on' or 'off'", map[string]string{
 				"serial_number": sn,
 				"state":         requestBody.State,
 			})
 			return
 		}
 
-		client, ok := getEcoflowClientOrRespondWithError(r, w)
+		client, ok := h.GetEcoflowClientOrRespondWithError(r, w)
 		if !ok {
 			return
 		}
@@ -94,15 +103,15 @@ func PowerStationEnableDc() func(http.ResponseWriter, *http.Request) {
 
 		ecoflowResponse, err := client.GetPowerStation(sn).SetDcSwitch(context.Background(), newState)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ErrEnableDcOut, err.Error(), map[string]string{
+			h.RespondWithError(w, http.StatusInternalServerError, constants.ErrEnableDcOut, err.Error(), map[string]string{
 				"serial_number": sn,
 			})
 		}
-		respondWithSuccess(w, ecoflowResponse)
+		h.RespondWithSuccess(w, ecoflowResponse)
 	}
 }
 
-func PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
+func (h *PowerStationHandler) PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
@@ -115,7 +124,7 @@ func PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
 				"serial_number": sn,
 				"error":         err.Error(),
 			})
@@ -123,7 +132,7 @@ func PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.AcState != "on" && requestBody.AcState != "off" {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. ac_state must be 'on' or 'off'", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. ac_state must be 'on' or 'off'", map[string]string{
 				"serial_number": sn,
 				"ac_state":      requestBody.AcState,
 			})
@@ -131,7 +140,7 @@ func PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.XBoostState != "on" && requestBody.XBoostState != "off" {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. xboost_state must be 'on' or 'off'", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. xboost_state must be 'on' or 'off'", map[string]string{
 				"serial_number": sn,
 				"xboost_state":  requestBody.XBoostState,
 			})
@@ -139,7 +148,7 @@ func PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.OutFreq != 50 && requestBody.OutFreq != 60 {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. out_freq must be 50 or 60", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. out_freq must be 50 or 60", map[string]string{
 				"serial_number": sn,
 				"out_freq":      fmt.Sprintf("%d", requestBody.OutFreq),
 			})
@@ -147,14 +156,14 @@ func PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.OutVoltage == 0 {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. out_voltage must not be 0", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. out_voltage must not be 0", map[string]string{
 				"serial_number": sn,
 				"out_voltage":   fmt.Sprintf("%d", requestBody.OutVoltage),
 			})
 			return
 		}
 
-		client, ok := getEcoflowClientOrRespondWithError(r, w)
+		client, ok := h.GetEcoflowClientOrRespondWithError(r, w)
 		if !ok {
 			return
 		}
@@ -183,15 +192,15 @@ func PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 		ecoflowResponse, err := client.GetPowerStation(sn).SetAcEnabled(context.Background(), newAcState, newXBoostState, newOutFreq, requestBody.OutVoltage)
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ErrEnableAcOut, err.Error(), map[string]string{
+			h.RespondWithError(w, http.StatusInternalServerError, constants.ErrEnableAcOut, err.Error(), map[string]string{
 				"serial_number": sn,
 			})
 		}
-		respondWithSuccess(w, ecoflowResponse)
+		h.RespondWithSuccess(w, ecoflowResponse)
 	}
 }
 
-func PowerStationSetChargingSpeed() func(http.ResponseWriter, *http.Request) {
+func (h *PowerStationHandler) PowerStationSetChargingSpeed() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
@@ -201,7 +210,7 @@ func PowerStationSetChargingSpeed() func(http.ResponseWriter, *http.Request) {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
 				"serial_number": sn,
 				"error":         err.Error(),
 			})
@@ -209,29 +218,29 @@ func PowerStationSetChargingSpeed() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.Watts <= 0 {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. watts must be greater than 0", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. watts must be greater than 0", map[string]string{
 				"serial_number": sn,
 				"watts":         fmt.Sprintf("%d", requestBody.Watts),
 			})
 			return
 		}
 
-		client, ok := getEcoflowClientOrRespondWithError(r, w)
+		client, ok := h.GetEcoflowClientOrRespondWithError(r, w)
 		if !ok {
 			return
 		}
 
 		ecoflowResponse, err := client.GetPowerStation(sn).SetAcChargingSettings(context.Background(), requestBody.Watts, 0)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ErrPowerStationSetChargingSpeed, err.Error(), map[string]string{
+			h.RespondWithError(w, http.StatusInternalServerError, constants.ErrPowerStationSetChargingSpeed, err.Error(), map[string]string{
 				"serial_number": sn,
 			})
 		}
-		respondWithSuccess(w, ecoflowResponse)
+		h.RespondWithSuccess(w, ecoflowResponse)
 	}
 }
 
-func PowerStationSetCarInput() func(http.ResponseWriter, *http.Request) {
+func (h *PowerStationHandler) PowerStationSetCarInput() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 		var requestBody struct {
@@ -240,36 +249,36 @@ func PowerStationSetCarInput() func(http.ResponseWriter, *http.Request) {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
 				"error":         err.Error(),
 				"serial_number": sn,
 			})
 			return
 		}
 		if requestBody.InputAmps < 4 || requestBody.InputAmps > 10 {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. amps must be between 4 and 10", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. amps must be between 4 and 10", map[string]string{
 				"serial_number": sn,
 				"amps":          fmt.Sprintf("%d", requestBody.InputAmps),
 			})
 			return
 		}
 
-		client, ok := getEcoflowClientOrRespondWithError(r, w)
+		client, ok := h.GetEcoflowClientOrRespondWithError(r, w)
 		if !ok {
 			return
 		}
 
 		ecoflowResponse, err := client.GetPowerStation(sn).Set12VDcChargingCurrent(context.Background(), requestBody.InputAmps*1000)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ErrPowerStationSetCarInput, err.Error(), map[string]string{
+			h.RespondWithError(w, http.StatusInternalServerError, constants.ErrPowerStationSetCarInput, err.Error(), map[string]string{
 				"serial_number": sn,
 			})
 		}
-		respondWithSuccess(w, ecoflowResponse)
+		h.RespondWithSuccess(w, ecoflowResponse)
 	}
 }
 
-func PowerStationSetStandBy() func(http.ResponseWriter, *http.Request) {
+func (h *PowerStationHandler) PowerStationSetStandBy() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 		var requestBody struct {
@@ -279,7 +288,7 @@ func PowerStationSetStandBy() func(http.ResponseWriter, *http.Request) {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
 				"serial_number": sn,
 				"error":         err.Error(),
 			})
@@ -287,7 +296,7 @@ func PowerStationSetStandBy() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.StandBy < 0 {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. stand_by must be greater than 0", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. stand_by must be greater than 0", map[string]string{
 				"serial_number": sn,
 				"stand_by":      fmt.Sprintf("%d", requestBody.StandBy),
 			})
@@ -295,24 +304,24 @@ func PowerStationSetStandBy() func(http.ResponseWriter, *http.Request) {
 		}
 
 		if requestBody.Type != "device" && requestBody.Type != "ac" && requestBody.Type != "car" && requestBody.Type != "lcd" {
-			respondWithError(w, http.StatusBadRequest, ErrInvalidParameters, "Invalid request. type must be 'device', 'ac', 'car' or 'lcd'", map[string]string{
+			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidParameters, "Invalid request. type must be 'device', 'ac', 'car' or 'lcd'", map[string]string{
 				"serial_number": sn,
 				"type":          requestBody.Type,
 			})
 			return
 		}
 
-		client, ok := getEcoflowClientOrRespondWithError(r, w)
+		client, ok := h.GetEcoflowClientOrRespondWithError(r, w)
 		if !ok {
 			return
 		}
 		ecoflowResponse, err := handleStandbyType(context.Background(), client.GetPowerStation(sn), requestBody.Type, requestBody.StandBy)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ErrPowerStationSetStandBy, err.Error(), map[string]string{
+			h.RespondWithError(w, http.StatusInternalServerError, constants.ErrPowerStationSetStandBy, err.Error(), map[string]string{
 				"serial_number": sn,
 			})
 		}
-		respondWithSuccess(w, ecoflowResponse)
+		h.RespondWithSuccess(w, ecoflowResponse)
 	}
 }
 
