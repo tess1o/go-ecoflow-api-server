@@ -18,7 +18,6 @@ import (
 // @title Ecoflow API Server
 // @version 1.0
 // @description API for managing Ecoflow devices.
-// @host localhost:8080
 // @BasePath /
 // @securityDefinitions.apikey Authorization
 // @type apiKey

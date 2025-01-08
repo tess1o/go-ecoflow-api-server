@@ -51,7 +51,7 @@ The API is not stable and can be changed in the future until v.1.0.0 is released
 ### Get docker container from registry
 
 ```shell
-docker run -p 8080:8080 tess1o/go-ecoflow-api-server:latest
+docker run -p 8080:8080 tess1o/go-ecoflow-api-server:0.0.2
 ```
 
 ### Build the Server from source
@@ -95,6 +95,8 @@ Now the server should be accessible on `http://localhost:8080`.
 Now the server should be accessible on `http://localhost:8080`.
 
 ## Requests / Responses
+
+Swagger is available at http://localhost:8080/swagger/index.html
 
 - ### Get all linked devices
 

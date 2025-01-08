@@ -62,7 +62,6 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:8080
 info:
   contact: {}
   description: API for managing Ecoflow devices.
