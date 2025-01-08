@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"github.com/tess1o/go-ecoflow"
 	"go-ecoflow-api-server/constants"
 	"net/http"
@@ -17,14 +18,37 @@ func NewPowerStationHandler(baseHandler *BaseHandler) *PowerStationHandler {
 	return &PowerStationHandler{baseHandler}
 }
 
+func (h *PowerStationHandler) RegisterRoutes(router chi.Router) {
+	router.Put("/api/power_station/{serial_number}/out/ac", h.PowerStationEnableAc())
+	router.Put("/api/power_station/{serial_number}/out/dc", h.PowerStationEnableDc())
+	router.Put("/api/power_station/{serial_number}/out/car", h.PowerStationSetEnableCarCharging())
+	router.Put("/api/power_station/{serial_number}/input/speed", h.PowerStationSetChargingSpeed())
+	router.Put("/api/power_station/{serial_number}/input/car", h.PowerStationSetCarInput())
+	router.Put("/api/power_station/{serial_number}/standby", h.PowerStationSetStandBy())
+}
+
+type ChangeStateRequest struct {
+	State string `json:"state"`
+}
+
+// PowerStationSetEnableCarCharging enables or disables the car charger switch.
+//
+// @Summary Enable/Disable Car Charger
+// @Description Enables or disables the car charger for the power station based on the provided state (on/off).
+// @Tags Power Station
+// @Accept json
+// @Produce json
+// @Param serial_number path string true "Serial number of the power station"
+// @Param requestBody body ChangeStateRequest true "Request body containing the state"
+// @Success 200 {object} SuccessResponse "Successfully toggled car charger state"
+// @Failure 400 {object} ErrorResponse "Invalid input or request"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /api/power_station/{serial_number}/out/car [put]
 func (h *PowerStationHandler) PowerStationSetEnableCarCharging() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
-		var requestBody struct {
-			State string `json:"state"`
-		}
-
+		var requestBody ChangeStateRequest
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
 			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
@@ -64,13 +88,23 @@ func (h *PowerStationHandler) PowerStationSetEnableCarCharging() func(http.Respo
 	}
 }
 
+// PowerStationEnableDc enables or disables DC
+// @Summary Enable/Disable DC Output
+// @Description Enables or disables the DC output switch for the power station based on the provided state (on/off).
+// @Tags Power Station
+// @Accept json
+// @Produce json
+// @Param serial_number path string true "Serial number of the power station"
+// @Param requestBody body ChangeStateRequest true "Request body containing the state"
+// @Success 200 {object} SuccessResponse "Successfully toggled DC output state"
+// @Failure 400 {object} ErrorResponse "Invalid input or request"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /api/power_station/{serial_number}/out/dc [put]
 func (h *PowerStationHandler) PowerStationEnableDc() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
-		var requestBody struct {
-			State string `json:"state"`
-		}
+		var requestBody ChangeStateRequest
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
@@ -111,17 +145,30 @@ func (h *PowerStationHandler) PowerStationEnableDc() func(http.ResponseWriter, *
 	}
 }
 
+type EnableAcRequest struct {
+	AcState     string `json:"ac_state"`
+	XBoostState string `json:"xboost_state"`
+	OutFreq     int    `json:"out_freq"`
+	OutVoltage  int    `json:"out_voltage"`
+}
+
+// PowerStationEnableAc enables or disables AC with additional settings
+// @Summary Enable/Disable AC Output with settings
+// @Description Enables or disables the AC output switch for the power station with additional settings, like XBoost state, output frequency, and voltage.
+// @Tags Power Station
+// @Accept json
+// @Produce json
+// @Param serial_number path string true "Serial number of the power station"
+// @Param requestBody body EnableAcRequest true "Request body containing AC state, XBoost state, output frequency, and output voltage"
+// @Success 200 {object} SuccessResponse "Successfully toggled AC output state with defined settings"
+// @Failure 400 {object} ErrorResponse "Invalid input or request"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /api/power_station/{serial_number}/out/ac [put]
 func (h *PowerStationHandler) PowerStationEnableAc() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
-		var requestBody struct {
-			AcState     string `json:"ac_state"`
-			XBoostState string `json:"xboost_state"`
-			OutFreq     int    `json:"out_freq"`
-			OutVoltage  int    `json:"out_voltage"`
-		}
-
+		var requestBody EnableAcRequest
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
 			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
@@ -200,14 +247,27 @@ func (h *PowerStationHandler) PowerStationEnableAc() func(http.ResponseWriter, *
 	}
 }
 
+type SetChargingSpeedRequest struct {
+	Watts int `json:"watts"`
+}
+
+// PowerStationSetChargingSpeed godoc
+// @Summary Set the charging speed (in watts) for a power station.
+// @Description Allows setting the charging speed in watts for a specific power station identified by its serial number.
+// @Tags Power Station
+// @Accept json
+// @Produce json
+// @Param serial_number path string true "Serial Number of the Power Station"
+// @Param requestBody body SetChargingSpeedRequest true "Charging Speed Request Body"
+// @Success 200 {object} SuccessResponse "Successfully set the charging speed"
+// @Failure 400 {object} ErrorResponse "Invalid request parameters or JSON body"
+// @Failure 500 {object} ErrorResponse "Internal server error occurred while processing the request"
+// @Router /api/power_station/{serial_number}/charging-speed [put]
 func (h *PowerStationHandler) PowerStationSetChargingSpeed() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
 
-		var requestBody struct {
-			Watts int `json:"watts"`
-		}
-
+		var requestBody SetChargingSpeedRequest
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
 			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
@@ -240,13 +300,27 @@ func (h *PowerStationHandler) PowerStationSetChargingSpeed() func(http.ResponseW
 	}
 }
 
+type InputAmpsRequest struct {
+	InputAmps int `json:"amps"`
+}
+
+// PowerStationSetCarInput set the input for car charger
+// @Summary Set the car input charging current for a power station.
+// @Description Allows setting the car input charging current (in amps) for a specific power station identified by its serial number.
+// @Tags Power Station
+// @Accept json
+// @Produce json
+// @Param serial_number path string true "Serial Number of the Power Station"
+// @Param requestBody body InputAmpsRequest true "Car Input Charging Request Body"
+// @Success 200 {object} SuccessResponse "Successfully set the car input current"
+// @Failure 400 {object} ErrorResponse "Invalid request parameters or JSON body"
+// @Failure 500 {object} ErrorResponse "Internal server error occurred while processing the request"
+// @Router /api/power_station/{serial_number}/car-input [put]
 func (h *PowerStationHandler) PowerStationSetCarInput() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
-		var requestBody struct {
-			InputAmps int `json:"amps"`
-		}
 
+		var requestBody InputAmpsRequest
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
 			h.RespondWithError(w, http.StatusBadRequest, constants.ErrInvalidJsonBody, "Invalid JSON Body", map[string]string{
@@ -278,13 +352,28 @@ func (h *PowerStationHandler) PowerStationSetCarInput() func(http.ResponseWriter
 	}
 }
 
+type StandByRequest struct {
+	Type    string `json:"type"`
+	StandBy int    `json:"stand_by"`
+}
+
+// PowerStationSetStandBy set stand by parameters for Device, AC, Car LCD screen.
+// @Summary Set standby settings for a power station.
+// @Description Allows setting standby time and standby type for a specific power station identified by its serial number.
+// @Tags Power Station
+// @Accept json
+// @Produce json
+// @Param serial_number path string true "Serial Number of the Power Station"
+// @Param requestBody body StandByRequest true "Standby Request Body"
+// @Success 200 {object} SuccessResponse "Successfully set the standby settings"
+// @Failure 400 {object} ErrorResponse "Invalid request parameters or JSON body"
+// @Failure 500 {object} ErrorResponse "Internal server error occurred while processing the request"
+// @Router /api/power_station/{serial_number}/standby [put]
 func (h *PowerStationHandler) PowerStationSetStandBy() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sn := r.PathValue("serial_number")
-		var requestBody struct {
-			Type    string `json:"type"`
-			StandBy int    `json:"stand_by"`
-		}
+
+		var requestBody StandByRequest
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {

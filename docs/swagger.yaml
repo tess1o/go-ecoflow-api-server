@@ -1,0 +1,379 @@
+basePath: /
+definitions:
+  handlers.ChangeStateRequest:
+    properties:
+      state:
+        type: string
+    type: object
+  handlers.EnableAcRequest:
+    properties:
+      ac_state:
+        type: string
+      out_freq:
+        type: integer
+      out_voltage:
+        type: integer
+      xboost_state:
+        type: string
+    type: object
+  handlers.ErrorField:
+    properties:
+      code:
+        type: string
+      details:
+        description: Optional
+      message:
+        type: string
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/handlers.ErrorField'
+      success:
+        type: boolean
+    type: object
+  handlers.InputAmpsRequest:
+    properties:
+      amps:
+        type: integer
+    type: object
+  handlers.QueryParametersRequest:
+    properties:
+      parameters:
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.SetChargingSpeedRequest:
+    properties:
+      watts:
+        type: integer
+    type: object
+  handlers.StandByRequest:
+    properties:
+      stand_by:
+        type: integer
+      type:
+        type: string
+    type: object
+  handlers.SuccessResponse:
+    properties:
+      data: {}
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing Ecoflow devices.
+  title: Ecoflow API Server
+  version: "1.0"
+paths:
+  /api/devices:
+    get:
+      description: Returns a list of all devices associated with the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of devices retrieved successfully
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "500":
+          description: Error retrieving device list
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get a list of devices
+      tags:
+      - Devices
+  /api/devices/{serial_number}/parameters:
+    get:
+      description: Retrieves all available parameters for a device using its serial
+        number
+      parameters:
+      - description: Device Serial Number
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Parameters retrieved successfully
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "500":
+          description: Error retrieving device parameters
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get all parameters for a device
+      tags:
+      - Devices
+  /api/devices/{serial_number}/parameters/query:
+    post:
+      consumes:
+      - application/json
+      description: Queries specific parameters for a device using its serial number
+      parameters:
+      - description: Device Serial Number
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      - description: List of parameters to query
+        in: body
+        name: parameters
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.QueryParametersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Requested parameters retrieved successfully
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Error Invalid JSON Body
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Error retrieving device parameters
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Query specific parameters for a device
+      tags:
+      - Devices
+  /api/power_station/{serial_number}/car-input:
+    put:
+      consumes:
+      - application/json
+      description: Allows setting the car input charging current (in amps) for a specific
+        power station identified by its serial number.
+      parameters:
+      - description: Serial Number of the Power Station
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      - description: Car Input Charging Request Body
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.InputAmpsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully set the car input current
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Invalid request parameters or JSON body
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error occurred while processing the request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Set the car input charging current for a power station.
+      tags:
+      - Power Station
+  /api/power_station/{serial_number}/charging-speed:
+    put:
+      consumes:
+      - application/json
+      description: Allows setting the charging speed in watts for a specific power
+        station identified by its serial number.
+      parameters:
+      - description: Serial Number of the Power Station
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      - description: Charging Speed Request Body
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SetChargingSpeedRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully set the charging speed
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Invalid request parameters or JSON body
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error occurred while processing the request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Set the charging speed (in watts) for a power station.
+      tags:
+      - Power Station
+  /api/power_station/{serial_number}/out/ac:
+    put:
+      consumes:
+      - application/json
+      description: Enables or disables the AC output switch for the power station
+        with additional settings, like XBoost state, output frequency, and voltage.
+      parameters:
+      - description: Serial number of the power station
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      - description: Request body containing AC state, XBoost state, output frequency,
+          and output voltage
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EnableAcRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully toggled AC output state with defined settings
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Invalid input or request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Enable/Disable AC Output with settings
+      tags:
+      - Power Station
+  /api/power_station/{serial_number}/out/car:
+    put:
+      consumes:
+      - application/json
+      description: Enables or disables the car charger for the power station based
+        on the provided state (on/off).
+      parameters:
+      - description: Serial number of the power station
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      - description: Request body containing the state
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChangeStateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully toggled car charger state
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Invalid input or request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Enable/Disable Car Charger
+      tags:
+      - Power Station
+  /api/power_station/{serial_number}/out/dc:
+    put:
+      consumes:
+      - application/json
+      description: Enables or disables the DC output switch for the power station
+        based on the provided state (on/off).
+      parameters:
+      - description: Serial number of the power station
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      - description: Request body containing the state
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChangeStateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully toggled DC output state
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Invalid input or request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Enable/Disable DC Output
+      tags:
+      - Power Station
+  /api/power_station/{serial_number}/standby:
+    put:
+      consumes:
+      - application/json
+      description: Allows setting standby time and standby type for a specific power
+        station identified by its serial number.
+      parameters:
+      - description: Serial Number of the Power Station
+        in: path
+        name: serial_number
+        required: true
+        type: string
+      - description: Standby Request Body
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.StandByRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully set the standby settings
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Invalid request parameters or JSON body
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error occurred while processing the request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Set standby settings for a power station.
+      tags:
+      - Power Station
+security:
+- Authorization: []
+- X-Secret-Token: []
+securityDefinitions:
+  Authorization:
+    description: 'Ecoflow Access Token. Use the format: Bearer <access_token>'
+    in: header
+    name: Authorization
+    type: apiKey
+  X-Secret-Token:
+    description: Ecoflow Secret Token
+    in: header
+    name: X-Secret-Token
+    type: apiKey
+swagger: "2.0"

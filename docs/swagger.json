@@ -1,0 +1,566 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for managing Ecoflow devices.",
+        "title": "Ecoflow API Server",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/devices": {
+            "get": {
+                "description": "Returns a list of all devices associated with the user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Get a list of devices",
+                "responses": {
+                    "200": {
+                        "description": "List of devices retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error retrieving device list",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/devices/{serial_number}/parameters": {
+            "get": {
+                "description": "Retrieves all available parameters for a device using its serial number",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Get all parameters for a device",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device Serial Number",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Parameters retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error retrieving device parameters",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/devices/{serial_number}/parameters/query": {
+            "post": {
+                "description": "Queries specific parameters for a device using its serial number",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Query specific parameters for a device",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device Serial Number",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List of parameters to query",
+                        "name": "parameters",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.QueryParametersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Requested parameters retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Error Invalid JSON Body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error retrieving device parameters",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/power_station/{serial_number}/car-input": {
+            "put": {
+                "description": "Allows setting the car input charging current (in amps) for a specific power station identified by its serial number.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Power Station"
+                ],
+                "summary": "Set the car input charging current for a power station.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Serial Number of the Power Station",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Car Input Charging Request Body",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InputAmpsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully set the car input current",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters or JSON body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error occurred while processing the request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/power_station/{serial_number}/charging-speed": {
+            "put": {
+                "description": "Allows setting the charging speed in watts for a specific power station identified by its serial number.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Power Station"
+                ],
+                "summary": "Set the charging speed (in watts) for a power station.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Serial Number of the Power Station",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Charging Speed Request Body",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SetChargingSpeedRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully set the charging speed",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters or JSON body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error occurred while processing the request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/power_station/{serial_number}/out/ac": {
+            "put": {
+                "description": "Enables or disables the AC output switch for the power station with additional settings, like XBoost state, output frequency, and voltage.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Power Station"
+                ],
+                "summary": "Enable/Disable AC Output with settings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Serial number of the power station",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body containing AC state, XBoost state, output frequency, and output voltage",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.EnableAcRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully toggled AC output state with defined settings",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/power_station/{serial_number}/out/car": {
+            "put": {
+                "description": "Enables or disables the car charger for the power station based on the provided state (on/off).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Power Station"
+                ],
+                "summary": "Enable/Disable Car Charger",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Serial number of the power station",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body containing the state",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ChangeStateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully toggled car charger state",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/power_station/{serial_number}/out/dc": {
+            "put": {
+                "description": "Enables or disables the DC output switch for the power station based on the provided state (on/off).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Power Station"
+                ],
+                "summary": "Enable/Disable DC Output",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Serial number of the power station",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body containing the state",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ChangeStateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully toggled DC output state",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/power_station/{serial_number}/standby": {
+            "put": {
+                "description": "Allows setting standby time and standby type for a specific power station identified by its serial number.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Power Station"
+                ],
+                "summary": "Set standby settings for a power station.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Serial Number of the Power Station",
+                        "name": "serial_number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Standby Request Body",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.StandByRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully set the standby settings",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters or JSON body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error occurred while processing the request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.ChangeStateRequest": {
+            "type": "object",
+            "properties": {
+                "state": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.EnableAcRequest": {
+            "type": "object",
+            "properties": {
+                "ac_state": {
+                    "type": "string"
+                },
+                "out_freq": {
+                    "type": "integer"
+                },
+                "out_voltage": {
+                    "type": "integer"
+                },
+                "xboost_state": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ErrorField": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "details": {
+                    "description": "Optional"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/handlers.ErrorField"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "handlers.InputAmpsRequest": {
+            "type": "object",
+            "properties": {
+                "amps": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.QueryParametersRequest": {
+            "type": "object",
+            "properties": {
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "handlers.SetChargingSpeedRequest": {
+            "type": "object",
+            "properties": {
+                "watts": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.StandByRequest": {
+            "type": "object",
+            "properties": {
+                "stand_by": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Authorization": {
+            "description": "Ecoflow Access Token. Use the format: Bearer \u003caccess_token\u003e",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        },
+        "X-Secret-Token": {
+            "description": "Ecoflow Secret Token",
+            "type": "apiKey",
+            "name": "X-Secret-Token",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "Authorization": []
+        },
+        {
+            "X-Secret-Token": []
+        }
+    ]
+}
