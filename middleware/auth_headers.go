@@ -6,24 +6,23 @@ import (
 	"net/http"
 )
 
-var authHeaders = []string{
-	constants.HeaderAuthorization,
-	constants.HeaderXSecretToken,
-}
-
 type AuthHeadersMiddleware struct {
 	*handlers.BaseHandler
+	headers []string
 }
 
-func NewAuthHeadersMiddleware(baseHandler *handlers.BaseHandler) *AuthHeadersMiddleware {
-	return &AuthHeadersMiddleware{baseHandler}
+func NewAuthHeadersMiddleware(baseHandler *handlers.BaseHandler, headers []string) *AuthHeadersMiddleware {
+	return &AuthHeadersMiddleware{
+		BaseHandler: baseHandler,
+		headers:     headers,
+	}
 }
 
 func (a *AuthHeadersMiddleware) CheckAuthHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		for _, h := range authHeaders {
-			if _, exists := r.Header[h]; !exists {
-				a.RespondWithError(w, http.StatusUnauthorized, constants.ErrMandatoryHeaderMissing, "Mandatory header is missing", map[string]string{
+		for _, h := range a.headers {
+			if v, exists := r.Header[h]; !exists || (len(v) == 1 && v[0] == "") {
+				a.RespondWithError(w, http.StatusUnauthorized, constants.ErrMandatoryHeaderMissing, "Mandatory header is missing or empty", map[string]string{
 					"header": h,
 				})
 				return

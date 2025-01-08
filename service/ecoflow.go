@@ -21,6 +21,9 @@ func getTokens(r *http.Request) (string, string, error) {
 		return "", "", err
 	}
 	secretToken := getSecretToken(r)
+	if accessToken == "" || secretToken == "" {
+		return "", "", errors.New("unauthorized: missing " + constants.HeaderAuthorization + " or " + constants.HeaderXSecretToken + " header")
+	}
 	return accessToken, secretToken, nil
 }
 

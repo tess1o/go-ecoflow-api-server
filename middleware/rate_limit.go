@@ -8,21 +8,18 @@ import (
 	"time"
 )
 
-const (
-	limit        = 60
-	windowLength = time.Minute
-)
-
 type RateLimitMiddleware struct {
 	*handlers.BaseHandler
+	limit        int
+	windowLength time.Duration
 }
 
-func NewRateLimitMiddleware(b *handlers.BaseHandler) *RateLimitMiddleware {
-	return &RateLimitMiddleware{b}
+func NewRateLimitMiddleware(b *handlers.BaseHandler, limit int, windowLength time.Duration) *RateLimitMiddleware {
+	return &RateLimitMiddleware{BaseHandler: b, limit: limit, windowLength: windowLength}
 }
 
 func (rl *RateLimitMiddleware) RateLimit() func(next http.Handler) http.Handler {
-	rateLimiter := httprate.Limit(limit, windowLength,
+	rateLimiter := httprate.Limit(rl.limit, rl.windowLength,
 		httprate.WithLimitHandler(func(w http.ResponseWriter, r *http.Request) {
 			rl.RespondWithError(w, http.StatusTooManyRequests, constants.ErrRateLimitExceeded, "Rate limit exceeded", map[string]string{
 				"url":         r.URL.String(),

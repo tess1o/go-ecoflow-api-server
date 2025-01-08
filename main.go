@@ -13,6 +13,12 @@ import (
 	"go-ecoflow-api-server/service"
 	"log/slog"
 	"net/http"
+	"time"
+)
+
+const (
+	rateLimit             = 60
+	rateLimitWindowLength = time.Minute
 )
 
 // @title Ecoflow API Server
@@ -64,6 +70,6 @@ func setMiddleware(router chi.Router, log *httplog.Logger, baseHandler *handlers
 	router.Use(httplog.RequestLogger(log))
 	router.Use(chimiddleware.Recoverer)
 	router.Use(chimiddleware.Timeout(constants.RequestTimeout))
-	router.Use(middleware.NewAuthHeadersMiddleware(baseHandler).CheckAuthHeaders)
-	router.Use(middleware.NewRateLimitMiddleware(baseHandler).RateLimit())
+	router.Use(middleware.NewAuthHeadersMiddleware(baseHandler, []string{constants.HeaderAuthorization, constants.HeaderXSecretToken}).CheckAuthHeaders)
+	router.Use(middleware.NewRateLimitMiddleware(baseHandler, rateLimit, rateLimitWindowLength).RateLimit())
 }

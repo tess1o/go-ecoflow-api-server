@@ -51,7 +51,7 @@ The API is not stable and can be changed in the future until v.1.0.0 is released
 ### Get docker container from registry
 
 ```shell
-docker run -p 8080:8080 tess1o/go-ecoflow-api-server:0.0.2
+docker run -p 8080:8080 tess1o/go-ecoflow-api-server:0.0.3
 ```
 
 ### Build the Server from source

@@ -23,15 +23,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Extract GitHub tag
+      - name: Extract GitHub tag # strip "v" from release version so this value can be used as tag for docker image
         id: extract_tag
         run: |
-          echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/')
+          echo "GIT_TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
       - name: Print GitHub tag
         run: |
           echo "The value of GIT_TAG is: $GIT_TAG"
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/v')
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
