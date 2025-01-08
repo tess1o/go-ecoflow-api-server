@@ -10,3 +10,8 @@ const (
 const (
 	RequestTimeout = 30 * time.Second
 )
+
+const (
+	RateLimit             = 60
+	RateLimitWindowLength = time.Minute
+)

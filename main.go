@@ -13,12 +13,6 @@ import (
 	"go-ecoflow-api-server/service"
 	"log/slog"
 	"net/http"
-	"time"
-)
-
-const (
-	rateLimit             = 60
-	rateLimitWindowLength = time.Minute
 )
 
 // @title Ecoflow API Server
@@ -41,13 +35,13 @@ const (
 // @security X-Secret-Token
 func main() {
 	log := logger.GetLogger(slog.LevelDebug)
-	baseHandler := handlers.NewBaseHandler(log, service.GetEcoflowClient)
 
 	router := chi.NewRouter()
-
+	baseHandler := handlers.NewBaseHandler(log, service.GetEcoflowClient)
 	deviceHandler := handlers.NewDeviceHandler(baseHandler)
 	powerStationHandler := handlers.NewPowerStationHandler(baseHandler)
 
+	// create api routes
 	router.Group(func(apiRouter chi.Router) {
 		setMiddleware(apiRouter, log, baseHandler)
 		deviceHandler.RegisterRoutes(apiRouter)
@@ -65,11 +59,13 @@ func main() {
 }
 
 func setMiddleware(router chi.Router, log *httplog.Logger, baseHandler *handlers.BaseHandler) {
-	router.Use(chimiddleware.RequestID)
-	router.Use(chimiddleware.RealIP)
-	router.Use(httplog.RequestLogger(log))
-	router.Use(chimiddleware.Recoverer)
-	router.Use(chimiddleware.Timeout(constants.RequestTimeout))
-	router.Use(middleware.NewAuthHeadersMiddleware(baseHandler, []string{constants.HeaderAuthorization, constants.HeaderXSecretToken}).CheckAuthHeaders)
-	router.Use(middleware.NewRateLimitMiddleware(baseHandler, rateLimit, rateLimitWindowLength).RateLimit())
+	router.Use(chimiddleware.RequestID)                         //add request id to each request
+	router.Use(chimiddleware.RealIP)                            //get real ip address for headers
+	router.Use(httplog.RequestLogger(log))                      //log all requests without sensitive headers
+	router.Use(chimiddleware.Recoverer)                         //recover in case of panic
+	router.Use(chimiddleware.Timeout(constants.RequestTimeout)) //max request duration
+
+	authheaders := []string{constants.HeaderAuthorization, constants.HeaderXSecretToken}
+	router.Use(middleware.NewAuthHeadersMiddleware(baseHandler, authheaders).CheckAuthHeaders)                                   // check mandatory auth headers
+	router.Use(middleware.NewRateLimitMiddleware(baseHandler, constants.RateLimit, constants.RateLimitWindowLength).RateLimit()) // rate limit (60 requests per minute)
 }

@@ -4,11 +4,12 @@
 
 1. [Description](#description)
 2. [Ecoflow API implemented so far](#ecoflow-api-implemented-so-far)
-3. [Deployment](#deployment)
+3. [Try it!](#try-it)
+4. [Deployment](#deployment)
     - [Get docker container from registry](#get-docker-container-from-registry)
     - [Build the Server from source](#build-the-server-from-source)
     - [Build a Docker Image from source](#build-a-docker-image-from-source)
-4. [Requests / Responses](#requests--responses)
+5. [Requests / Responses](#requests--responses)
     - [Get all linked devices](#get-all-linked-devices)
     - [Get all parameters for given device](#get-all-parameters-for-given-device)
     - [Get specified parameters for specified device](#get-specified-parameters-for-specified-device)
@@ -18,6 +19,7 @@
     - [Change charging speed](#change-charging-speed)
     - [Change car input](#change-car-input)
     - [Change StandBy parameters](#change-standby-parameters)
+6. [Error Codes](#error-codes)
 
 ## Description
 
@@ -32,7 +34,7 @@ The access token is sent in `Authorization: Bearer XXX` header, the secret token
 
 ## Caution!
 
-The API is not stable and can be changed in the future until v.1.0.0 is released.
+The API is not stable and can be changed in the future until v1.0.0 is released.
 
 ## Ecoflow API implemented so far:
 
@@ -45,6 +47,13 @@ The API is not stable and can be changed in the future until v.1.0.0 is released
 7. Change charging speed
 8. Change Car Input
 9. Change stand by settings for device, AC, DC, LCD screen
+
+## Try it!
+
+This server is deployed to http://ecoflow-api-server.tessio.cc
+Swagger is available at http://ecoflow-api-server.tessio.cc/swagger/index.html
+
+(!) It does not log or store in any way your Access and Secret tokens.
 
 ## Deployment
 
@@ -686,3 +695,10 @@ curl -XPOST http://localhost:8080/api/power_station/R601ZCB5HEAXXXXX/standby \
   }
 }
 ```
+
+## Error codes
+
+This API returns error codes when an error happens. You can check them in the source
+code: [error_codes.go](constants/error_codes.go). It should simplify monitoring / debugging process.
+
+Please note that Ecoflow have their error codes which are also returned in the API response.
